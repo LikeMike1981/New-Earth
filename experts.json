@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Chefingenieur",
+    "effect": "Raketenmodule kosten weniger Material."
+  },
+  {
+    "name": "Botanikerin",
+    "effect": "Nahrungsproduktion wird effizienter."
+  },
+  {
+    "name": "Geologe",
+    "effect": "Ressourcenförderung wird effizienter."
+  },
+  {
+    "name": "Logistikchefin",
+    "effect": "Mehr Fracht kann transportiert werden."
+  },
+  {
+    "name": "Klimaforscher",
+    "effect": "Schäden an ausgewählten Feldern können verhindert werden."
+  }
+]

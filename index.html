@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>New Earth – Erdprototyp</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>NEW EARTH</h1>
+    <p>Erdprototyp v0.1</p>
+  </div>
+  <div class="round">Runde <strong id="round">1</strong>/10</div>
+</header>
+
+<main>
+  <section class="panel status">
+    <h2>Organisation</h2>
+    <div class="stats" id="stats"></div>
+    <div class="message" id="message">Wähle eine Aktion.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Aktuelle Krise</h2>
+    <div id="eventCard" class="event-card">
+      <strong>Noch kein Ereignis</strong>
+      <span>Decke zu Beginn der Runde eine Ereigniskarte auf.</span>
+    </div>
+    <button id="drawEvent">Ereignis aufdecken</button>
+  </section>
+
+  <section class="panel">
+    <h2>Worker Placement</h2>
+    <p>Jeder Siedler ist ein Worker. Verfügbar: <strong id="workers">3</strong></p>
+    <div class="actions">
+      <button data-action="build">🏗 Bauen</button>
+      <button data-action="recruit">👥 Rekrutieren</button>
+      <button data-action="research">🔬 Forschen</button>
+      <button data-action="rocket">🚀 Raumfahrt</button>
+    </div>
+  </section>
+
+  <section class="panel earth-panel">
+    <div class="section-title">
+      <h2>Erde</h2>
+      <span>Gesund → beschädigt → verloren</span>
+    </div>
+    <div id="earthBoard" class="earth-board"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Rakete</h2>
+    <div class="rocket">
+      <div class="rocket-module mandatory">Antrieb<br><small>Stufe <span id="engineLevel">0</span></small></div>
+      <div id="rocketModules" class="rocket-modules"></div>
+      <div class="rocket-capacity">Kapazität: <span id="rocketCapacity">0</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Rundenende</h2>
+    <p>Gebäude produzieren. Danach benötigen alle Siedler und Experten zusammen Nahrung.</p>
+    <button id="endRound" class="primary">Produzieren, ernähren & Runde beenden</button>
+    <button id="resetGame" class="secondary">Partie zurücksetzen</button>
+  </section>
+</main>
+
+<dialog id="choiceDialog">
+  <form method="dialog">
+    <h3 id="dialogTitle">Aktion</h3>
+    <div id="dialogContent"></div>
+    <button value="cancel" class="secondary">Abbrechen</button>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

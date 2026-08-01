@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Vollautomatischer Tagebau",
+    "type": "earth",
+    "effect": "Erhalte hohen Sofortertrag und zerstöre danach das Feld."
+  },
+  {
+    "name": "Wissensdatenbank",
+    "type": "earth",
+    "effect": "Forschung und wissenschaftliche Experten werden günstiger."
+  },
+  {
+    "name": "Frachtkomprimierung",
+    "type": "colony",
+    "effect": "Ressourcen benötigen weniger Raketenplatz."
+  },
+  {
+    "name": "Digitales Wissensarchiv",
+    "type": "colony",
+    "effect": "Einige Technologien benötigen keinen Frachtraum."
+  },
+  {
+    "name": "Schutzkuppel",
+    "type": "earth",
+    "effect": "Ein Feld benötigt zusätzlichen Schaden, bevor es zerstört wird."
+  }
+]
