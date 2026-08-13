@@ -1,0 +1,52 @@
+[
+  {
+    "Abflug": "R3",
+    "Bis10SP": 17.56,
+    "Prod1": 5.14,
+    "Prod2": 5.33,
+    "Prod3": 5.65,
+    "Erdverluste": 0.3,
+    "TechFracht": 0.96,
+    "UngenutzteFracht": 6.79
+  },
+  {
+    "Abflug": "R4",
+    "Bis10SP": 17.72,
+    "Prod1": 5.25,
+    "Prod2": 5.48,
+    "Prod3": 6.4,
+    "Erdverluste": 0.72,
+    "TechFracht": 1.25,
+    "UngenutzteFracht": 5.55
+  },
+  {
+    "Abflug": "R5",
+    "Bis10SP": 17.35,
+    "Prod1": 6.37,
+    "Prod2": 7.18,
+    "Prod3": 8.23,
+    "Erdverluste": 2.09,
+    "TechFracht": 1.59,
+    "UngenutzteFracht": 3.88
+  },
+  {
+    "Abflug": "R6",
+    "Bis10SP": 17.81,
+    "Prod1": 6.89,
+    "Prod2": 8.11,
+    "Prod3": 8.85,
+    "Erdverluste": 3.53,
+    "TechFracht": 1.72,
+    "UngenutzteFracht": 2.61
+  },
+  {
+    "Abflug": "R7",
+    "Bis10SP": 18.51,
+    "Prod1": 7.21,
+    "Prod2": 8.67,
+    "Prod3": 9.18,
+    "Erdverluste": 5.01,
+    "TechFracht": 1.95,
+    "UngenutzteFracht": 1.83
+  }
+]

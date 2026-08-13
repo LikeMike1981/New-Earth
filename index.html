@@ -1,80 +1,8 @@
-<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>New Earth – Erdprototyp</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<header>
-  <div>
-    <h1>NEW EARTH</h1>
-    <p>Erdprototyp v0.1</p>
-  </div>
-  <div class="round">Runde <strong id="round">1</strong>/10</div>
-</header>
-
-<main>
-  <section class="panel status">
-    <h2>Organisation</h2>
-    <div class="stats" id="stats"></div>
-    <div class="message" id="message">Wähle eine Aktion.</div>
-  </section>
-
-  <section class="panel">
-    <h2>Aktuelle Krise</h2>
-    <div id="eventCard" class="event-card">
-      <strong>Noch kein Ereignis</strong>
-      <span>Decke zu Beginn der Runde eine Ereigniskarte auf.</span>
-    </div>
-    <button id="drawEvent">Ereignis aufdecken</button>
-  </section>
-
-  <section class="panel">
-    <h2>Worker Placement</h2>
-    <p>Jeder Siedler ist ein Worker. Verfügbar: <strong id="workers">3</strong></p>
-    <div class="actions">
-      <button data-action="build">🏗 Bauen</button>
-      <button data-action="recruit">👥 Rekrutieren</button>
-      <button data-action="research">🔬 Forschen</button>
-      <button data-action="rocket">🚀 Raumfahrt</button>
-    </div>
-  </section>
-
-  <section class="panel earth-panel">
-    <div class="section-title">
-      <h2>Erde</h2>
-      <span>Gesund → beschädigt → verloren</span>
-    </div>
-    <div id="earthBoard" class="earth-board"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Rakete</h2>
-    <div class="rocket">
-      <div class="rocket-module mandatory">Antrieb<br><small>Stufe <span id="engineLevel">0</span></small></div>
-      <div id="rocketModules" class="rocket-modules"></div>
-      <div class="rocket-capacity">Kapazität: <span id="rocketCapacity">0</span></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <h2>Rundenende</h2>
-    <p>Gebäude produzieren. Danach benötigen alle Siedler und Experten zusammen Nahrung.</p>
-    <button id="endRound" class="primary">Produzieren, ernähren & Runde beenden</button>
-    <button id="resetGame" class="secondary">Partie zurücksetzen</button>
-  </section>
-</main>
-
-<dialog id="choiceDialog">
-  <form method="dialog">
-    <h3 id="dialogTitle">Aktion</h3>
-    <div id="dialogContent"></div>
-    <button value="cancel" class="secondary">Abbrechen</button>
-  </form>
-</dialog>
-
-<script src="app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>New Earth – v0.2</title><link rel="stylesheet" href="styles.css"></head><body>
+<header><div><h1>NEW EARTH</h1><p>Spielbarer Prototyp v0.2</p></div><div class="header-state"><span id="phaseLabel">ERDE</span><span>Runde <strong id="round">1</strong></span></div></header><main>
+<section class="panel status-panel"><div class="section-title"><h2>Status</h2><button id="debugToggle" class="secondary">Debug</button></div><div id="stats" class="stats"></div><div id="danger" class="danger-card"></div><div id="message" class="message">Baue deine Erd-Engine auf – oder bereite den frühen Abflug vor.</div></section>
+<div id="earthPhase" class="phase-grid"><section class="panel"><h2>Katastrophe</h2><div id="eventCard" class="event-card"></div><button id="drawEvent" class="primary">Ereignis aufdecken</button><button id="vargaPeek" class="secondary" hidden></button></section><section class="panel"><h2>Rakete</h2><div id="rocketSummary" class="rocket-summary"></div><div id="rocketButtons" class="actions"></div></section><section class="panel wide"><div class="section-title"><h2>18 Erdregionen</h2><span>intakt → beschädigt → zerstört</span></div><div id="earthBoard" class="earth-board"></div></section><section class="panel wide"><h2>Standardgebäude – immer verfügbar</h2><div id="buildings" class="catalog"></div></section><section class="panel wide"><h2>Projektkarten</h2><div id="projects" class="catalog"></div></section><section class="panel wide"><h2>Zukunftstechnologien</h2><div id="technologies" class="catalog"></div></section><section class="panel wide"><h2>Experten</h2><div id="experts" class="catalog"></div></section></div>
+<div id="newEarthPhase" class="phase-grid" hidden><section class="panel wide hero-ne"><h2>New Earth</h2><div id="neStats" class="ne-summary"></div><div id="neBuild" class="actions"></div></section><section class="panel wide"><h2>Bekannte Funde</h2><div id="known" class="catalog"></div><p id="analyzed"></p></section></div>
+<section class="panel wide end-panel"><button id="endRound" class="primary big">Einkommen erhalten & Runde beenden</button><button id="resetGame" class="secondary">Partie zurücksetzen</button></section><section id="debugPanel" class="panel wide debug" hidden><h2>Debug & Balancing</h2><div id="debugBody"></div><div id="simResults" class="table-wrap"></div></section></main>
+<dialog id="dialog"><h3 id="dialogTitle"></h3><div id="dialogBody"></div><div class="dialog-actions"><button id="dialogCancel" class="secondary">Abbrechen</button><button id="dialogConfirm" class="primary">Bestätigen</button></div></dialog>
+<script src="data.js"></script><script src="engine.js"></script><script src="simulation.js"></script><script src="ui.js"></script></body></html>

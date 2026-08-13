@@ -1,44 +1,25 @@
-# New Earth – Erdprototyp v0.1
+# New Earth – spielbarer Prototyp v0.2
 
-Ein bewusst kleiner, offline lauffähiger Web-Prototyp für das Brettspiel **New Earth**.
+Offline-fähiger Vanilla-HTML/CSS/JS-Prototyp nach **New Earth – Design- und Balancing-Dokument v0.2**.
 
-## Auf dem iPad sofort öffnen
+## Start
+`index.html` in Safari/Browser öffnen. Kein Build-Schritt nötig.
 
-1. Entpacke die ZIP-Datei in der Dateien-App.
-2. Tippe auf `index.html`.
-3. Öffne die Datei in Safari.
+## Enthalten
+- Erde mit 18 Regionen, 3 Schadenszuständen und v0.2-Einkommen
+- 5 immer verfügbare Standardgebäude
+- 15 Projektkarten, 10 Zukunftstechnologien, 8 Experten
+- 12 Ereignisse in Instabilität/Krise/Kollaps
+- modulare Rakete, harte Beladekapazitäten und individueller Abflug
+- New Earth: Siedlungen, Mine, Farm, Labor, Rover, Exploration/Analyse, 10-SP-Ende
+- Debugmodus mit Ressourcen/Runde/Seed, Tech/Experten, Rakete, Ereignis erzwingen, Export/Import
+- UI-unabhängige Regel-Engine und Headless-Simulation
 
-Falls iPadOS lokale JavaScript-Dateien blockiert, lade den Ordner in ein GitHub-Repository und öffne ihn über GitHub Pages, Codespaces oder einen beliebigen statischen Webhost.
+## Tests / Simulation
+```sh
+node tests/test.js
+node simulate.js
+```
+`simulate.js` führt 10.000 Monte-Carlo-Läufe pro Abflugstrategie R3–R7 aus und schreibt `SIMULATION_RESULTS.json`.
 
-## Empfohlener Codex-Workflow auf dem iPad
-
-1. Erstelle bei GitHub ein neues Repository, z. B. `new-earth`.
-2. Lade den gesamten Inhalt dieses Ordners hoch und committe ihn.
-3. Öffne Codex im Browser und verbinde das Repository.
-4. Gib Codex kleine Tickets aus `docs/BACKLOG.md`.
-5. Lass Codex nach jeder Änderung die Regeln in `docs/GAME_RULES.md` aktualisieren.
-
-## Bereits spielbar
-
-- 10 Erdrunden
-- 5 Geländetypen mit je 2 Bauplätzen
-- gesund → beschädigt → verloren
-- 10 einfache Ereignisse
-- Bevölkerung = Worker
-- Bauen, Rekrutieren, Forschen, Raumfahrt
-- automatische Produktion und Ernährung
-- erste modulare Rakete
-
-## Noch bewusst vereinfacht
-
-- Einzelspieler
-- Ereignisse treffen automatisch ein geeignetes Feld
-- Experten und Technologien sind Platzhalter
-- kein Start und kein Planetenteil
-- kein finales Balancing
-
-## Ziel des Prototyps
-
-Nicht Schönheit oder Vollständigkeit, sondern die Frage:
-
-> Fühlt sich der Konflikt zwischen Erd-Engine, Raketenbau und begrenzter Zeit bereits interessant an?
+Siehe `IMPLEMENTATION_NOTES_v0.2.md` und `BALANCE_REPORT_v0.2.md`.
