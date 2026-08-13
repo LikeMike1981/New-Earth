@@ -5,12 +5,12 @@ function tryEarth(s,launchRound,u,log,strategy='balanced'){const r=s.round,c=E.c
 if(r>=launchRound-(launchRound>=6?4:3)){if(c.people<5&&afford(s,E.rocketCost(s,'habitat'))){if(E.buildRocket(s,'habitat').ok){record('Wohnmodul gebaut');return}}
 if(launchRound>=6&&['expansion','balanced'].includes(strategy)&&c.people<8&&(s.population+s.experts.length)>=6&&afford(s,E.rocketCost(s,'habitat'))){if(E.buildRocket(s,'habitat').ok){record('zweites Wohnmodul gebaut');return}}if(c.resources<9&&afford(s,E.rocketCost(s,'cargo'))){if(E.buildRocket(s,'cargo').ok){record('Frachtraum gebaut');return}}
 if(launchRound>=5){
- const prefabPriority={research:['prefabLab','prefabMine','roverHangar'],industry:['prefabMine','prefabLab','prefabFarm'],expansion:['prefabFarm','prefabMine'],exploration:['roverHangar','prefabLab'],balanced:['prefabMine','prefabFarm','prefabLab']}[strategy]||[];
- const maxPrefab=launchRound>=7?5:launchRound>=6?4:2;
+ const prefabPriority=launchRound===5?['roverHangar']:{research:['prefabLab','prefabMine','roverHangar'],industry:['prefabMine','prefabLab','prefabFarm'],expansion:['prefabFarm','prefabMine'],exploration:['roverHangar','prefabLab'],balanced:['prefabMine','prefabFarm','prefabLab']}[strategy]||[];
+ const maxPrefab=launchRound>=7?4:launchRound>=6?2:1;
  const builtPrefab=(s.rocket.prefabFarm||0)+(s.rocket.prefabMine||0)+(s.rocket.prefabLab||0)+(s.rocket.roverHangar||0);
- if(builtPrefab<maxPrefab)for(const pt of prefabPriority){const cap=E.capacities(s),needsTech=pt==='prefabLab',fits=needsTech?cap.tech>0:cap.resources>0;if(fits&&(pt!=='roverHangar'||(s.rocket[pt]||0)<1)&&afford(s,E.rocketCost(s,pt))){if(E.buildRocket(s,pt).ok){record(`${D.ROCKET[pt].name} gebaut`);return}}}
+ if(builtPrefab<maxPrefab)for(const pt of prefabPriority){const cap=E.capacities(s),needsTech=pt==='prefabLab',fits=needsTech?cap.tech>0:cap.resources>0;const lim=pt==='roverHangar'?1:(launchRound>=7&&strategy==='industry'&&pt==='prefabMine'?2:launchRound>=7&&strategy==='research'&&pt==='prefabLab'?2:launchRound>=7&&strategy==='expansion'&&pt==='prefabFarm'?2:1);if(fits&&(s.rocket[pt]||0)<lim&&afford(s,E.rocketCost(s,pt))){if(E.buildRocket(s,pt).ok){record(`${D.ROCKET[pt].name} gebaut`);return}}}
 }
-if(launchRound>=5&&['research','balanced','industry'].includes(strategy)&&c.tech<3&&E.transportableTechs(s).length>1&&afford(s,E.rocketCost(s,'tech'))){if(E.buildRocket(s,'tech').ok){record('Techmodul gebaut');return}}
+if(launchRound>=6&&['research','balanced','industry'].includes(strategy)&&c.tech<3&&E.transportableTechs(s).length>1&&afford(s,E.rocketCost(s,'tech'))){if(E.buildRocket(s,'tech').ok){record('Techmodul gebaut');return}}
 if(launchRound>=7&&c.tech<5&&E.transportableTechs(s).length>3&&afford(s,E.rocketCost(s,'tech'))){if(E.buildRocket(s,'tech').ok){record('zweites Techmodul gebaut');return}}if(c.people<Math.min(7,s.population+s.experts.length)&&afford(s,E.rocketCost(s,'habitat'))){if(E.buildRocket(s,'habitat').ok){record('Wohnmodul gebaut');return}}}
 const techPriority={
  research:['exobioLab','mobileResearch','drones','fabrication','extremophile','foodRecycler','habitats','longRover','builders','oxygen'],
@@ -22,9 +22,15 @@ const techPriority={
 for(const id of pr){const t=D.TECHNOLOGIES.find(x=>x.id===id);if(s.technologies[id]==='researched'&&afford(s,t.cost)){if(E.buildTech(s,id).ok){u.tech[id]=(u.tech[id]||0)+1;record(`${t.name} gebaut`);return}}}
 for(const id of pr){const t=D.TECHNOLOGIES.find(x=>x.id===id);if(s.technologies[id]==='locked'&&s.science>=Math.max(0,t.research-1)){if(E.researchTech(s,id).ok){record(`${t.name} erforscht`);return}}}
 if(r<=launchRound-1){
- const futureSeats=E.capacities(s).people+(afford(s,E.rocketCost(s,'habitat'))?3:0),maxExperts=Math.max(0,futureSeats-3);
- if(s.experts.length<maxExperts){for(const id of ({research:['okafor','varga','mei','sato','johnson','alvarez','williams','petrov'],industry:['sato','johnson','williams','mei','alvarez','okafor','petrov','varga'],expansion:['alvarez','williams','sato','mei','johnson','okafor','petrov','varga'],exploration:['johnson','mei','okafor','williams','sato','alvarez','petrov','varga'],balanced:['johnson','okafor','sato','alvarez','mei','williams','petrov','varga']}[strategy]||['johnson','okafor','sato','alvarez','mei','williams','petrov','varga'])){const x=D.EXPERTS.find(e=>e.id===id);if(s.expertMarket?.includes(id)&&!s.experts.includes(id)&&!(id==='williams'&&s.rocket.cargo<1)&&!(launchRound<=4&&s.rocket.cargo<1)&&afford(s,x.cost)){if(E.hireExpert(s,id).ok){u.expert[id]=(u.expert[id]||0)+1;record(`${x.name} rekrutiert`);return}}}}
- for(const id of ['openScience','resourceDepot','recycling','mobileResearch','robotFarm','autonomousMining','globalContracts']){const q=D.PROJECTS.find(x=>x.id===id);if(s.projectMarket?.includes(id)&&!s.projects.includes(id)&&afford(s,q.cost)){if(E.buyProject(s,id).ok){u.project[id]=(u.project[id]||0)+1;record(`${q.name} gebaut`);return}}}
+ const futureSeats=E.capacities(s).people+(afford(s,E.rocketCost(s,'habitat'))?3:0),maxExperts=Math.min(2,Math.max(0,futureSeats-3));
+ const base={research:{okafor:12,mei:7,varga:5,sato:4,johnson:5,alvarez:3,williams:4,petrov:3},industry:{sato:11,johnson:9,williams:6,mei:5,alvarez:4,okafor:4,petrov:3,varga:2},expansion:{alvarez:11,williams:8,sato:6,mei:5,johnson:5,okafor:3,petrov:4,varga:3},exploration:{johnson:10,mei:8,okafor:7,williams:6,sato:4,alvarez:4,petrov:3,varga:3},balanced:{johnson:8,okafor:8,sato:7,alvarez:7,mei:6,williams:5,petrov:3,varga:3}}[strategy]||{};
+ if(s.experts.length<maxExperts){
+  const candidates=(s.expertMarket||[]).filter(id=>!s.experts.includes(id)).map(id=>{const x=D.EXPERTS.find(e=>e.id===id);let score=base[id]||3;if(id==='williams'&&s.rocket.cargo<1)score-=8;if(launchRound<=4&&s.rocket.cargo<1)score-=4;score-=s.experts.length*2;return{id,x,score}}).filter(z=>z.x&&afford(s,z.x.cost)).sort((a,b)=>b.score-a.score);
+  const best=candidates[0];if(best&&best.score>=6){if(E.hireExpert(s,best.id).ok){u.expert[best.id]=(u.expert[best.id]||0)+1;record(`${best.x.name} rekrutiert`);return}}
+ }
+ const projectScores={research:{openScience:10,mobileResearch:9,recycling:6,globalContracts:5,resourceDepot:4,robotFarm:3,autonomousMining:3},industry:{autonomousMining:10,resourceDepot:8,recycling:7,globalContracts:6,mobileResearch:4,robotFarm:4,openScience:3},expansion:{robotFarm:10,recycling:8,resourceDepot:6,globalContracts:6,mobileResearch:4,openScience:3,autonomousMining:4},exploration:{mobileResearch:9,resourceDepot:7,openScience:6,recycling:5,globalContracts:5,autonomousMining:4,robotFarm:3},balanced:{recycling:8,resourceDepot:7,mobileResearch:7,globalContracts:6,openScience:6,robotFarm:5,autonomousMining:5}}[strategy]||{};
+ const pc=(s.projectMarket||[]).map(id=>({id,q:D.PROJECTS.find(x=>x.id===id),score:projectScores[id]||3})).filter(z=>z.q&&!s.projects.includes(z.id)&&afford(s,z.q.cost)).sort((a,b)=>b.score-a.score)[0];
+ if(pc&&pc.score>=6){if(E.buyProject(s,pc.id).ok){u.project[pc.id]=(u.project[pc.id]||0)+1;record(`${pc.q.name} gebaut`);return}}
 }
 for(const [bid,type] of [['mine','resources'],['researchCenter','research'],['factory','industry']]){const b=D.STANDARD_BUILDINGS[bid],reg=s.regions.find(x=>x.type===type&&x.status&&x.buildings.length===0);if(reg&&afford(s,b.cost)){if(E.buildEarth(s,bid,reg.id).ok){record(`${b.name} gebaut`);return}}}
 s.actions=0}
@@ -36,6 +42,10 @@ const valid=(kind,t)=>t&&t.state!=='unknown'&&E.hexDist(home,t)<=1&&!t.buildings
 const tileFor=(kind,terrains)=>n.tiles.find(t=>valid(kind,t)&&t.analyzed&&terrains.includes(t.discovery?.terrain))||n.tiles.find(t=>valid(kind,t)&&t.analyzed)||home;
 const doBuild=(kind,terrains)=>{if(n.material<E.neCost(s,kind))return false;const t=tileFor(kind,terrains),q=E.neBuild(s,kind,t.id);if(q.ok){record(q.msg);return true}return false};
 const prod=()=>{const c=JSON.parse(JSON.stringify(s));return E.neProduction(c)};
+const freeKnown=t=>!t.blockedBy;
+const nearWin=n.vp>=7;
+const canScoreSite=t=>t&&freeKnown(t)&&t.analyzed&&!t.settlement;
+
 // Strategic opening: building is not mandatory. Frontier/relic plans may explore/analyze first.
 if(n.rounds===0&&(n.buildings.mine+n.buildings.farm+n.buildings.lab)===0){
  const plans=[
@@ -59,8 +69,8 @@ if(missions.includes('alienTech')&&n.alienResearch.length<3){for(const x of E.AL
 // Frontier is a legitimate opening: exploration itself now has milestone SP.
 if(missions.includes('frontier')&&(n.roverExplored||0)<5){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>((y.type==='alien'?5:0)+(y.id==='mineral'?3:0)+(y.id==='fertile'?2:0))-((x.type==='alien'?5:0)+(x.id==='mineral'?3:0)+(x.id==='fertile'?2:0)))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}
 // Analyze valuable known finds: relics, mission finds, then productive terrain.
-const value=t=>(['ruin','signal'].includes(t.discovery.id)?9:0)+(missions.includes('xenoScience')?3:0)+(t.discovery.id==='mineral'&&n.buildings.mine<2?5:0)+(['fertile','ice','microbes'].includes(t.discovery.id)&&n.buildings.farm<2?4:0)-(t.discovery.analysis||0);
-for(const t of n.tiles.filter(t=>t.discovery&&!t.analyzed&&t.discovery.id!=='plain').sort((x,y)=>value(y)-value(x))){const q=E.analyze(s,t.discovery.id,t.id);if(q.ok){record(q.msg);return}}
+const value=t=>(!freeKnown(t)?-100:0)+(['ruin','signal'].includes(t.discovery.id)?(nearWin?14:11):0)+(missions.includes('xenoScience')?3:0)+(t.discovery.id==='mineral'&&n.buildings.mine<2?5:0)+(['fertile','ice','microbes'].includes(t.discovery.id)&&n.buildings.farm<2?4:0)-(t.discovery.analysis||0);
+for(const t of n.tiles.filter(t=>t.discovery&&!t.analyzed&&!t.blockedBy&&t.discovery.id!=='plain').sort((x,y)=>value(y)-value(x))){const q=E.analyze(s,t.discovery.id,t.id);if(q.ok){record(q.msg);return}}
 // Contact is a different late-game engine: prepared science/exploration colonies can invest in communication instead of merely copying relic tech.
 if(n.contactUnlocked&&['research','exploration','balanced'].includes(strategy)){
  if(!E.hasAlien(s,'linguistics')&&n.science>=4){const q=E.alienResearch(s,'linguistics');if(q.ok){record(q.msg);return}}
@@ -79,17 +89,19 @@ if(p.food<n.population&&doBuild('farm',['fertile','ice','plain']))return;
 if(p.science<2&&doBuild('lab',['ruin','plain']))return;
 // Exploration is also useful without Frontier because 3/7 discoveries score.
 if((n.roverExplored||0)<7){const next=(n.roverExplored||0)<3?3:7;if(next-(n.roverExplored||0)<=2){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>(y.type==='alien'?1:0)-(x.type==='alien'?1:0))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}}
-// Deep specialization: once stable, different colonies deliberately over-invest in different engines.
-if(strategy==='research'&&n.buildings.lab<4&&doBuild('lab',['ruin','plain']))return;
-if(strategy==='industry'&&n.buildings.mine<5&&doBuild('mine',['mineral','canyon','plain']))return;
-if(strategy==='expansion'&&n.buildings.farm<4&&doBuild('farm',['fertile','ice','plain']))return;
+// Near the finish line, stop engine-building if a settlement can score immediately.
+if(nearWin&&n.material>=E.neCost(s,'settlement')&&E.neFoodProd(s)>=(E.has(s,'foodRecycler')?0:n.settlements+1)){const t=n.tiles.find(x=>x.analyzed&&!x.settlement&&!x.blockedBy&&E.neReach(s,x));if(t){const q=E.neBuild(s,'settlement',t.id);if(q.ok){record(q.msg);return}}}
+// Deep specialization: only while it still improves a relevant economy; don't spam a fourth/fifth building by identity alone.
+if(strategy==='research'&&n.buildings.lab<3&&!nearWin&&doBuild('lab',['ruin','plain']))return;
+if(strategy==='industry'&&n.buildings.mine<3&&!nearWin&&doBuild('mine',['mineral','canyon','plain']))return;
+if(strategy==='expansion'&&n.buildings.farm<3&&!nearWin&&doBuild('farm',['fertile','ice','plain']))return;
 if(strategy==='exploration'&&(n.roverExplored||0)<7){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>(y.type==='alien'?1:0)-(x.type==='alien'?1:0))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}
 // Develop special sites for SP rather than spam generic buildings.
-if(n.buildings.mine<(strategy==='industry'?5:strategy==='research'?1:3)&&doBuild('mine',['mineral','canyon']))return;
-if(n.buildings.farm<(strategy==='expansion'?4:strategy==='industry'?1:2)&&doBuild('farm',['fertile','ice']))return;
-if(n.buildings.lab<(strategy==='research'?4:strategy==='industry'?1:2)&&doBuild('lab',['ruin']))return;
+if(n.buildings.mine<(strategy==='industry'?3:strategy==='research'?1:2)&&doBuild('mine',['mineral','canyon']))return;
+if(n.buildings.farm<(strategy==='expansion'?3:strategy==='industry'?1:2)&&doBuild('farm',['fertile','ice']))return;
+if(n.buildings.lab<(strategy==='research'?3:strategy==='industry'?1:2)&&doBuild('lab',['ruin']))return;
 // Settlement network: useful, but diminishing SP means it is not the only late-game answer.
-if(n.material>=E.neCost(s,'settlement')&&E.neFoodProd(s)>=(E.has(s,'foodRecycler')?0:n.settlements+1)){const t=n.tiles.find(x=>x.analyzed&&!x.settlement&&E.neReach(s,x));if(t){const q=E.neBuild(s,'settlement',t.id);if(q.ok){record(q.msg);return}}}
+const settlementCap=strategy==='expansion'?5:4;if(n.settlements<settlementCap&&n.material>=E.neCost(s,'settlement')&&E.neFoodProd(s)>=(E.has(s,'foodRecycler')?0:n.settlements+1)){const t=n.tiles.find(x=>x.analyzed&&!x.settlement&&!x.blockedBy&&E.neReach(s,x));if(t){const q=E.neBuild(s,'settlement',t.id);if(q.ok){record(q.msg);return}}}
 n.actions=0}
 function runOne(launchRound,seed=1,det=false,withLog=false,strategy='balanced'){const s=E.newGame(seed),launchStyle=strategy,preferredShift={research:0,industry:0,balanced:0,expansion:0,exploration:0}[strategy]||0,plannedLaunch=Math.max(3,Math.min(7,launchRound+preferredShift)),usage={tech:{},expert:{},project:{}},vpTimeline={},log=[];let landingRound=null,launchLoad=null;while(!s.gameOver&&s.round<40){if(s.phase==='earth'){if(!s.event)E.drawEvent(s,det?({1:'heat',2:'brainDrain',3:'supply',4:'drought',5:'energy',6:'infra',7:'cascade'}[s.round]):undefined);while(s.actions>0&&s.round<plannedLaunch)tryEarth(s,plannedLaunch,usage,withLog?log:null,strategy);if(s.round>=plannedLaunch){launchLoad=load(s,strategy);if(E.launch(s,launchLoad).ok){landingRound=s.round;if(withLog)log.push({round:s.round,phase:'launch',action:'RAKETENSTART',load:launchLoad,vp:s.newEarth.vp});continue}}E.endRound(s)}else{while(s.newEarth.actions>0&&!s.gameOver)tryNE(s,withLog?log:null,strategy);E.endRound(s);vpTimeline[s.round]=s.newEarth.vp}}
 const n=s.newEarth||{prodHistory:[],vp:0,tech:[],experts:[],population:0,landingMaterial:0},cap=E.capacities(s);return{seed,strategy,launchRound:plannedLaunch,launchAnchor:launchRound,finishRound:s.gameOver?s.round:null,landingRound,launchLoad,log:withLog?log:undefined,vpTimeline,neRoundsToWin:s.gameOver&&landingRound!=null?s.round-landingRound:null,prod1:n.prodHistory[0]||null,prod2:n.prodHistory[1]||null,prod3:n.prodHistory[2]||null,earthLosses:s.earthLosses,techValue:n.tech.length,unused:{people:Math.max(0,cap.people-n.population-n.experts.length),resources:Math.max(0,cap.resources-(n.landingMaterial||0)),tech:Math.max(0,cap.tech-n.tech.length)},usage,finalVP:n.vp,buildings:n.buildings||{},profile:s.newEarth?E.strategyProfile(s):{},contactLevel:n.contactLevel||0,contactUnlocked:!!n.contactUnlocked,alienResearch:[...(n.alienResearch||[])],missions:(n.missions||[]).map(m=>({id:m.id,selected:!!m.selected,claimed:!!m.claimed,vp:m.vp}))}}
@@ -194,7 +206,7 @@ function runRace(seed=1,strategies=['balanced','balanced'],launches=[3,5]){
   }
   if(players.some(p=>p.finished))break;worldRound++;
  }
- return players.map(p=>({id:p.id,launchRound:p.launchRound,strategy:p.strategy,finished:p.finished,vp:p.s.newEarth?.vp||0,landed:p.landed,experts:p.s.experts||[],projects:p.s.projects||[],settlements:p.s.newEarth?.settlements||0,explored:p.s.newEarth?.roverExplored||0}));
+ return players.map(p=>({id:p.id,launchRound:p.launchRound,strategy:p.strategy,finished:p.finished,vp:p.s.newEarth?.vp||0,landed:p.landed,experts:p.s.experts||[],projects:p.s.projects||[],rocket:p.s.rocket,settlements:p.s.newEarth?.settlements||0,explored:p.s.newEarth?.roverExplored||0,buildings:p.s.newEarth?.buildings||{}}));
 }
 api.runRace=runRace;module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
