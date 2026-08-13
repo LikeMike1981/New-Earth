@@ -246,3 +246,62 @@ body{
   .danger-track-title{writing-mode:vertical-rl}
   .danger-step{height:40px;flex:1}
 }
+
+/* v0.3 Earth economy readability */
+.message{position:sticky;top:0;z-index:20;font-weight:850;box-shadow:0 3px 10px #0002}
+.card-meta{display:flex;gap:6px;min-height:22px;margin-bottom:3px}
+.investment,.tempo{font-size:9px;font-weight:900;letter-spacing:.08em;padding:4px 6px;border-radius:999px;border:1px solid #0004}
+.investment.klein{background:#c9ddb8}.investment.mittel{background:#e4cf93}.investment.groß{background:#d89b83}
+.tempo.now{background:#d7e6ea}.tempo.later{background:#c9c5df}
+.design-note{font-size:11px;font-style:italic;border-top:1px solid #6b573b55;padding-top:7px;color:#514631}
+
+/* ======================================================
+   v0.4 NEW EARTH — alien hex exploration board
+   ====================================================== */
+.ne-shell{display:grid;grid-template-columns:230px minmax(650px,1fr) 260px;gap:12px;margin-top:14px}
+.ne-panel,.ne-map-panel,.ne-build-market{background:linear-gradient(#101a20ee,#091014ee);border:3px solid #344e5a;border-radius:9px;box-shadow:0 9px 22px #000a,inset 0 0 0 1px #6a859144;color:#dce8e6}
+.ne-panel{padding:13px}.ne-panel h3{font:700 19px Georgia,serif;margin:5px 0 10px}.ne-left,.ne-right{display:flex;flex-direction:column;gap:12px}
+.ne-map-panel{padding:12px;overflow:hidden;background:radial-gradient(circle at 50% 42%,#16344a 0,#101922 44%,#090d13 100%)}
+.ne-map-head{display:flex;justify-content:space-between;align-items:flex-end}.ne-map-head h2{font:30px Georgia,serif;margin:2px 0}.ne-map-legend{display:flex;gap:12px;font-size:9px;color:#9fc2cf}
+.ne-hex-map{position:relative;width:690px;height:540px;margin:4px auto 0}
+.ne-hex{position:absolute;width:116px;height:132px;border:0;padding:0;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%);background:#1a2029;color:white;overflow:hidden;box-shadow:none;filter:drop-shadow(0 3px 3px #0008);transition:.14s transform,.14s filter;touch-action:manipulation}
+.ne-hex:before{content:"";position:absolute;inset:4px;clip-path:inherit;background-position:center;background-size:cover;filter:saturate(.9) brightness(.72)}
+.ne-hex.unknown:before{background:radial-gradient(circle at 50% 45%,#252b39,#11141c 70%)}
+.ne-hex.terrain-plain:before{background-image:linear-gradient(#0001,#07101588),url("assets/alien-plain.jpg")}
+.ne-hex.terrain-mineral:before,.ne-hex.terrain-resource:before{background-image:linear-gradient(#0001,#25100666),url("assets/alien-mineral.jpg")}
+.ne-hex.terrain-fertile:before,.ne-hex.terrain-biology:before{background-image:linear-gradient(#001b0f22,#00120a66),url("assets/alien-fertile.jpg")}
+.ne-hex.terrain-ruin:before,.ne-hex.terrain-alien:before{background-image:linear-gradient(#16001b22,#11001677),url("assets/alien-ruin.jpg")}
+.ne-hex.terrain-ice:before{background-image:linear-gradient(#00172822,#00111f55),url("assets/alien-ice.jpg")}
+.ne-hex.terrain-canyon:before{background-image:linear-gradient(#2a120322,#17090066),url("assets/alien-canyon.jpg")}
+.ne-hex.reachable{filter:drop-shadow(0 0 7px #27bff8) drop-shadow(0 3px 3px #0008)}
+.ne-hex.selected{filter:drop-shadow(0 0 9px #b6e669) drop-shadow(0 3px 3px #0008);z-index:3;transform:scale(1.06)}
+.ne-hex.analyzed,.ne-hex.settled{filter:drop-shadow(0 0 6px #9fd469) drop-shadow(0 3px 3px #0008)}
+.unknown-mark{position:absolute;z-index:2;left:0;right:0;top:42px;text-align:center;font:900 35px Georgia;color:#9196a4}
+.hex-name{position:absolute;z-index:2;left:8px;right:8px;bottom:22px;font:800 9px Georgia;text-align:center;text-shadow:0 2px 3px #000}
+.settlement-mark{position:absolute;z-index:3;left:46px;top:40px;font-size:25px}.hex-buildings{position:absolute;z-index:3;right:13px;top:18px;font-size:15px}.analyzed-mark{position:absolute;z-index:3;left:14px;top:18px;border-radius:50%;background:#759b43;padding:2px 5px;font-weight:900}
+.ne-map-hint{margin:0 auto 4px;width:max-content;padding:6px 10px;border:1px solid #46636f;background:#0a1217cc;border-radius:4px;font-size:10px}
+.ne-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.ne-stat-grid div{padding:8px;background:#07101499;border:1px solid #39525e;border-radius:5px}.ne-stat-grid b,.ne-stat-grid span{display:block}.ne-stat-grid b{font-size:19px;color:#dce98c}.ne-stat-grid span{font-size:8px;text-transform:uppercase;color:#94afb8}
+.rover-status{margin-top:10px;padding:9px;background:#111d24;border-left:4px solid #4aaacb}.rover-status strong,.rover-status span{display:block}.rover-status span{font-size:10px;color:#9db7bf;margin-top:4px}
+.prod-line,.settlement-row{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #38505a55;font-size:11px}
+.selected-art{height:150px;border:2px solid #58717a;border-radius:5px;background-position:center;background-size:cover;margin:8px 0}.selected-art.terrain-unknown{background:radial-gradient(circle,#2c3341,#11151d)}
+.selected-art.terrain-plain{background-image:url("assets/alien-plain.jpg")}.selected-art.terrain-mineral,.selected-art.terrain-resource{background-image:url("assets/alien-mineral.jpg")}.selected-art.terrain-fertile,.selected-art.terrain-biology{background-image:url("assets/alien-fertile.jpg")}.selected-art.terrain-ruin,.selected-art.terrain-alien{background-image:url("assets/alien-ruin.jpg")}.selected-art.terrain-ice{background-image:url("assets/alien-ice.jpg")}.selected-art.terrain-canyon{background-image:url("assets/alien-canyon.jpg")}
+.tile-state{display:inline-block;font-size:8px;font-weight:900;letter-spacing:.1em;background:#253942;border-radius:999px;padding:4px 7px}.analysis-box{background:#071014cc;border:1px solid #43606d;padding:9px;margin:9px 0}.analysis-box strong,.analysis-box span{display:block}.analysis-box span{font-size:10px;margin-top:4px}.reward-preview{color:#d9e98e}
+.ne-build-market{margin-top:12px;padding:13px}.ne-build-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.ne-build-card{background:linear-gradient(#d3c49d,#a9936b);border:5px solid #29231c;border-radius:7px;color:#201d17;padding:8px;display:flex;flex-direction:column;min-height:250px}.ne-build-card .build-art{height:90px;border:2px solid #5b4e38;border-radius:4px;background-position:center;background-size:cover}.build-mine .build-art{background-image:url("assets/alien-mineral.jpg")}.build-farm .build-art{background-image:url("assets/alien-fertile.jpg")}.build-lab .build-art{background-image:url("assets/alien-ice.jpg")}.build-rover .build-art{background-image:url("assets/alien-canyon.jpg")}.build-settlement .build-art{background-image:url("assets/alien-plain.jpg")}.ne-build-card h3{font:800 15px Georgia;margin:7px 0 3px}.ne-build-card p{font-size:10px;line-height:1.35}.build-cost{font-weight:900;color:#563629}.ne-build-card button{margin-top:auto}
+.explore-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.explore-option{display:flex;flex-direction:column;min-height:240px;background:#1a252c;color:#edf3e8;border:2px solid #486876;border-radius:7px;padding:7px;text-align:left}.explore-art{height:105px;background-size:cover;background-position:center;border-radius:4px;margin-bottom:6px}.explore-art.terrain-plain{background-image:url("assets/alien-plain.jpg")}.explore-art.terrain-mineral,.explore-art.terrain-resource{background-image:url("assets/alien-mineral.jpg")}.explore-art.terrain-fertile,.explore-art.terrain-biology{background-image:url("assets/alien-fertile.jpg")}.explore-art.terrain-ruin,.explore-art.terrain-alien{background-image:url("assets/alien-ruin.jpg")}.explore-art.terrain-ice{background-image:url("assets/alien-ice.jpg")}.explore-art.terrain-canyon{background-image:url("assets/alien-canyon.jpg")}.explore-option small,.explore-option em{font-size:9px;margin-top:6px}.explore-option em{color:#c7dd8d}
+@media(max-width:1050px){.ne-shell{grid-template-columns:190px minmax(600px,1fr)}.ne-right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.ne-build-cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.ne-shell{display:block}.ne-left,.ne-right{display:grid;grid-template-columns:1fr 1fr;margin-bottom:10px}.ne-map-panel{overflow-x:auto}.ne-build-cards{grid-template-columns:repeat(2,1fr)}}
+
+.launch-prelude{padding:12px;background:#201c17;border-left:5px solid #d1a94f;color:#f3e6c7;margin-bottom:12px}.launch-prelude strong,.launch-prelude span{display:block}.launch-prelude span{font-size:11px;margin-top:5px}
+.landing-hero{height:220px;margin:-18px -18px 8px;background:linear-gradient(transparent,#071017cc),url("assets/alien-panel.jpg") center/cover;border-bottom:5px solid #4d7180}.landing-title{text-align:center;font:900 40px Georgia,serif;letter-spacing:.13em;color:#285568}.landing-lead{text-align:center;font:italic 15px Georgia,serif}.landing-unlocks{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:15px 0}.landing-unlocks div{background:#14242b;color:#e8f0e6;border:1px solid #527482;border-radius:5px;padding:10px;text-align:center}.landing-unlocks b,.landing-unlocks span{display:block}.landing-unlocks b{font-size:18px;color:#d9e98e}.landing-unlocks span{font-size:8px;text-transform:uppercase;margin-top:4px}.alien-research{margin-top:12px;padding-top:9px;border-top:1px solid #45616c}.alien-research>strong{display:block;color:#cfe889;font-size:9px;margin-bottom:6px}.alien-research button{width:100%;text-align:left;margin:3px 0;padding:7px;background:#14242b;color:#e2ece7;border:1px solid #45616c}.alien-research button b,.alien-research button span{display:block}.alien-research button span{font-size:8px;color:#9fb7be}
+
+/* v0.6 decision clarity */
+.mission-list{margin-top:12px;padding-top:9px;border-top:1px solid #45616c}.mission-list>strong{font-size:9px;color:#e7cf7e;letter-spacing:.08em}.mission{padding:7px;margin-top:5px;background:#111e24;border-left:3px solid #bd9650}.mission b,.mission span{display:block}.mission b{font-size:9px}.mission span{font-size:8px;color:#9db4bc;margin-top:3px}.mission.claimed{opacity:.65;border-left-color:#7da455;background:#243321}.cargo-arrival{padding:8px;background:#101c22;border:1px solid #527482;text-align:center;font-weight:700}
+.forecast-strip{padding:8px 10px;margin:8px 0;background:#39251d;color:#ffe3bd;border:1px solid #b66f43;border-left:5px solid #e1934f;font-size:10px}.forecast-strip b{color:#ffd06e}
+
+.mission:not(.selected){opacity:.86}.mission.selected{border-left-color:#72b7d2;background:#152933}.mission em{display:block;margin-top:4px;font-size:7px;color:#9fdaea;font-style:normal;font-weight:900}.mission button{margin-top:6px;min-height:28px;padding:4px 6px;font-size:7px;background:#2d5868;color:#eef8f7}.mission.claimed{border-left-color:#86ad55;background:#28371f}
+
+.strategy-panel{margin-top:10px;padding:9px;border:1px solid rgba(143,211,220,.25);border-radius:10px;background:rgba(11,34,41,.55)}.strategy-panel strong,.strategy-panel span{display:block}.strategy-panel span{font-size:8px;opacity:.75;margin:4px 0 7px}.strategy-panel button{margin:2px;min-height:30px;padding:5px 7px;font-size:8px}
+
+.ai-status{border-color:#6f8790}.ai-status strong{display:block}.ai-status span{display:block;font-size:.78rem;margin-top:.25rem}
+
+.ai-status{border-color:#6f8790}.ai-status strong,.ai-status span{display:block}.ai-controls{display:flex;gap:.35rem;margin-top:.35rem}.ai-controls select{max-width:9rem;font-size:.72rem;padding:.25rem}

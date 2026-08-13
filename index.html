@@ -1,10 +1,27 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#18251f"><title>New Earth – v0.2</title><link rel="stylesheet" href="styles.css"></head><body>
 <div class="tabletop"><header class="topbar"><div class="brand"><span class="planet-mark">◐</span><div><h1>NEW EARTH</h1><small>THE LAST VOYAGE</small></div></div><div class="round-badge"><span id="phaseLabel">ERDE</span><b>RUNDE <strong id="round">1</strong></b></div></header>
-<main><section class="player-mat"><div id="stats" class="stats"></div><div id="danger" class="danger-card"></div><div id="message" class="message">Wähle einen Meeple und dann seine Zielregion.</div></section>
+<main><section class="player-mat"><div id="stats" class="stats"></div><div id="danger" class="danger-card"></div><div id="aiStatus" class="danger-card ai-status"></div><div id="message" class="message">Wähle einen Meeple und dann seine Zielregion.</div></section>
 <div id="earthPhase"><section class="game-layout"><div class="board-wrap"><div class="board-head"><div><span class="eyebrow">DIE LETZTEN TAGE</span><h2>Erde</h2></div><div class="legend"><i class="dot intact-dot"></i> intakt <i class="dot damaged-dot"></i> beschädigt <i class="dot destroyed-dot"></i> zerstört</div></div><div id="dangerTrack" class="danger-track" aria-label="Gefahrenleiste"></div><div id="earthBoard" class="earth-board"></div><div class="board-instruction">👆 Meeple antippen → Zielregion antippen</div></div>
 <aside class="side-table"><section class="rocket-tableau"><div class="rocket-art">🚀</div><h2>ARK-01</h2><div id="rocketSummary"></div><div id="rocketButtons" class="actions"></div></section><section class="event-deck"><span class="eyebrow">GEFAHRENDECK</span><div id="eventCard" class="event-card"></div><button id="drawEvent" class="secondary">Ereignis aufdecken</button><button id="vargaPeek" class="secondary" hidden></button></section></aside></section>
 <section class="market"><div class="market-tabs"><button type="button" data-market="projects" class="active" aria-selected="true">Projekte</button><button type="button" data-market="technologies" aria-selected="false">Technologien</button><button type="button" data-market="experts" aria-selected="false">Experten</button><button type="button" data-market="buildings" aria-selected="false">Gebäude</button></div><div id="projects" class="card-row"></div><div id="technologies" class="card-row" hidden></div><div id="experts" class="card-row" hidden></div><div id="buildings" class="card-row" hidden></div></section></div>
-<div id="newEarthPhase" hidden><section class="alien-board"><div class="alien-sky"><span class="eyebrow">ANKUNFT</span><h2>New Earth</h2><div id="neStats" class="ne-summary"></div><div id="neBuild" class="actions"></div></div><div class="discoveries"><h2>Bekannte Funde</h2><div id="known" class="card-row"></div><p id="analyzed"></p></div></section></div>
+<div id="newEarthPhase" hidden>
+<section class="ne-shell">
+  <aside class="ne-left">
+    <section class="ne-panel"><span class="eyebrow">EXPEDITIONSSTATUS</span><h3>Rover & Kolonie</h3><div id="neStats"></div><div id="neRoverInfo"></div></section>
+    <section class="ne-panel"><span class="eyebrow">AKTIVE PRODUKTION</span><div id="neProduction"></div></section>
+  </aside>
+  <section class="ne-map-panel">
+    <div class="ne-map-head"><div><span class="eyebrow">KARTE DER NEUEN WELT</span><h2>Juno Basin</h2></div><div class="ne-map-legend"><span>◆ erreichbar</span><span>◈ entdeckt</span><span>⬢ analysiert</span></div></div>
+    <div id="neHexMap" class="ne-hex-map"></div>
+    <div id="neMapHint" class="ne-map-hint">Wähle ein Feld.</div>
+  </section>
+  <aside class="ne-right">
+    <section class="ne-panel ne-selected"><span class="eyebrow">AUSGEWÄHLTES FELD</span><div id="neSelected"></div></section>
+    <section class="ne-panel"><span class="eyebrow">SIEDLUNGEN</span><div id="neSettlements"></div></section>
+  </aside>
+</section>
+<section class="ne-build-market"><div class="board-head"><div><span class="eyebrow">BAUEN</span><h2>Kolonie</h2></div></div><div id="neBuild" class="ne-build-cards"></div></section>
+</div>
 <section class="round-controls"><button id="debugToggle" class="ghost">⚙ Debug</button><button id="resetGame" class="ghost">↻ Neustart</button><button id="endRound" class="primary big">NÄCHSTE RUNDE →</button></section><section id="debugPanel" class="debug" hidden><h2>Debug & Balancing</h2><div id="debugBody"></div><div id="simResults"></div></section></main></div>
 <dialog id="dialog" class="game-dialog"><h3 id="dialogTitle"></h3><div id="dialogBody"></div><div class="dialog-actions"><button id="dialogCancel" class="secondary">Abbrechen</button><button id="dialogConfirm" class="primary">Bestätigen</button></div></dialog>
 <dialog id="eventModal" class="event-modal"><div class="event-art" id="eventArt"></div><div class="event-kicker" id="eventTier"></div><div class="event-icon">⚠</div><h2 id="eventTitle"></h2><p id="eventEffect"></p><div id="eventDamage" class="event-damage"></div><button id="eventContinue" class="primary big">WEITER</button></dialog>
