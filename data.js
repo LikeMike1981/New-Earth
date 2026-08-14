@@ -64,7 +64,41 @@ TECHNOLOGIES.forEach(x=>x.tags=TAGS.technology[x.id]||[]);EXPERTS.forEach(x=>x.t
  ice:{analysis:2,vp:0,terrain:'ice',reward:'Sofort +2 Nahrung.'},
  plain:{analysis:1,vp:0,terrain:'plain',reward:'Sicherer Bauplatz. Keine weitere Belohnung.'}
  };DISCOVERIES.forEach(x=>Object.assign(x,discoveryPatch[x.id]||{}));
- const NEW_EARTH={buildings:X.newEarth.buildings};
- const BALANCE={winVP:10,featureFlags:{improvedEngine:false},danger:[{from:1,to:3,name:'Instabilität',damage:2},{from:4,to:6,name:'Krise',damage:3},{from:7,to:99,name:'Kollaps',damage:4}]};
- const api={REGION_TYPES,STANDARD_BUILDINGS,PROJECTS,TECHNOLOGIES,EXPERTS,EVENTS,ROCKET,DISCOVERIES,NEW_EARTH,BALANCE,TAGS};root.NewEarthData=api;if(typeof module!=='undefined')module.exports=api;
+ const NEW_EARTH_PROJECTS=[
+ {id:'pressureDome',name:'Druckkuppel',cost:{material:5},effect:'+3 O₂-Kapazität.',oxygen:3},
+ {id:'hydroponics',name:'Hydroponikmodule',cost:{material:4},effect:'+2 Nahrung/Runde.',production:{food:2}},
+ {id:'fieldWorkshop',name:'Feldwerkstatt',cost:{material:5},effect:'+2 Material/Runde.',production:{material:2}},
+ {id:'colonyInstitute',name:'Kolonie-Institut',cost:{material:5},effect:'+2 Wissenschaft/Runde.',production:{science:2}},
+ {id:'surveySatellite',name:'Prospektionssatellit',cost:{material:4,science:2},effect:'Rover-Reichweite +1; beim Erkunden +1 Auswahl.',range:1,exploreChoice:1},
+ {id:'modularHub',name:'Modulares Koloniezentrum',cost:{material:6},effect:'+1 O₂ und +1 flexible Produktion/Runde.',oxygen:1,flex:1}
+];
+const DISCOVERY_TECHS=[
+ {id:'crystalReactor',unlock:'mineral',name:'Resonanzreaktor',cost:{material:4,science:3},effect:'Mineral-Minen +1 M/Runde; +1 O₂.',oxygen:1},
+ {id:'deepExtractor',unlock:'mineral',name:'Kristall-Tiefenförderer',cost:{material:5,science:2},effect:'+3 Material/Runde.',production:{material:3}},
+ {id:'oxygenFlora',unlock:'microbes',name:'Sauerstoffflora',cost:{material:3,science:3},effect:'+3 O₂ und +1 Nahrung/Runde.',oxygen:3,production:{food:1}},
+ {id:'bioComposite',unlock:'fertile',name:'Biokomposite',cost:{material:3,science:2},effect:'Neue Siedlungen kosten 2 M weniger.',settlementDiscount:2},
+ {id:'gravityDrive',unlock:'ruin',name:'Gravitations-Rover',cost:{material:4,science:4},effect:'Rover-Reichweite +2.',range:2},
+ {id:'alienFabricator',unlock:'ruin',name:'Alien-Fabrikator',cost:{material:5,science:4},effect:'+2 flexible Produktion/Runde.',flex:2},
+ {id:'signalDecoder',unlock:'signal',name:'Signaldecoder',cost:{material:3,science:3},effect:'Eröffnet Kommunikation; Kontakt kostet 1 W weniger.',contact:true},
+ {id:'resonanceArray',unlock:'signal',name:'Resonanzarray',cost:{material:5,science:4},effect:'+2 Wissenschaft/Runde; Kontaktfortschritt wird attraktiver.',production:{science:2}},
+ {id:'iceElectrolysis',unlock:'ice',name:'Eis-Elektrolyse',cost:{material:4,science:2},effect:'+2 O₂ und +1 Nahrung/Runde.',oxygen:2,production:{food:1}},
+ {id:'canyonHab',unlock:'canyon',name:'Fels-Habitate',cost:{material:4,science:2},effect:'+2 O₂; neue Siedlungen −1 M.',oxygen:2,settlementDiscount:1}
+];
+const NEW_EARTH={buildings:X.newEarth.buildings,projects:NEW_EARTH_PROJECTS,discoveryTechs:DISCOVERY_TECHS};
+ const BALANCE={winVP:14,maxRounds:15,earthActions:3,newEarthActions:3,featureFlags:{improvedEngine:true,discoveryEngine:true},
+ danger:[{from:1,to:3,name:'Instabilität',damage:1},{from:4,to:6,name:'Krise',damage:2},{from:7,to:99,name:'Kollaps',damage:3}]};
+const EARTH_TRIGGER_BUILDINGS={
+ mine:{trigger:'build',text:'Beim Bauen einer Mine: Folge-Minen dieser Runde kosten 1 G weniger.'},
+ researchCenter:{trigger:'research',text:'Beim Forschen: +1 W Rabatt (max. einmal pro Runde).'},
+ highTechLab:{trigger:'research',text:'Beim Forschen: zusätzlicher −1 W Rabatt (max. einmal pro Runde).'},
+ factory:{trigger:'build',text:'Erstes Gebäude/Raketenmodul der Runde kostet 1 M weniger.'}
+};
+Object.entries(EARTH_TRIGGER_BUILDINGS).forEach(([id,x])=>{if(STANDARD_BUILDINGS[id])STANDARD_BUILDINGS[id].triggerText=x.text});
+const COLONY_UPGRADES=[
+ {id:'industryColony',name:'Industriekolonie',kind:'settlement',cost:{material:5},requires:'mine',effect:'Minen in Distanz 1 produzieren +1 M.',tags:['INDUSTRIE']},
+ {id:'researchColony',name:'Forschungskolonie',kind:'settlement',cost:{material:4,science:2},requires:'lab',effect:'Analysen in Distanz 1 kosten 1 W weniger.',tags:['FORSCHUNG']},
+ {id:'bioColony',name:'Biosphäre',kind:'settlement',cost:{material:5,science:1},requires:'farm',effect:'+2 O₂; Farmen in Distanz 1 produzieren +1 Nahrung.',oxygen:2,tags:['BIO','LEBEN']}
+];
+NEW_EARTH.upgrades=COLONY_UPGRADES;
+ const api={REGION_TYPES,STANDARD_BUILDINGS,PROJECTS,TECHNOLOGIES,EXPERTS,EVENTS,ROCKET,DISCOVERIES,NEW_EARTH,BALANCE,TAGS,EARTH_TRIGGER_BUILDINGS,COLONY_UPGRADES};root.NewEarthData=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,7 +1,24 @@
 (function(root){
 const D=root.NewEarthData||(typeof require!=='undefined'?require('./data.js'):null),E=root.NewEarthEngine||(typeof require!=='undefined'?require('./engine.js'):null);
 const afford=(s,c)=>(!c.money||s.money>=c.money)&&(!c.material||s.material>=c.material)&&(!c.science||s.science>=c.science);
-function tryEarth(s,launchRound,u,log,strategy='balanced'){const r=s.round,c=E.capacities(s),record=x=>{if(log)log.push({round:s.round,phase:'earth',action:x,money:s.money,material:s.material,science:s.science})};
+function chooseAdaptiveStrategy(s){
+ const ids=[...(s.projectHand||[]),...(s.projectMarket||[])],ex=s.expertMarket||[];
+ const score={research:0,industry:0,expansion:0,exploration:0};
+ const add=(st,n)=>score[st]+=n;
+ for(const id of ids){
+  if(['aiResearch','openScience','mobileResearch'].includes(id))add('research',3);
+  if(['deepDrilling','automatedChain','industry40','autonomousMining','resourceDepot'].includes(id))add('industry',3);
+  if(['robotFarm','recycling','evacNetwork'].includes(id))add('expansion',3);
+  if(['mobileResearch','privateSpace','resourceDepot'].includes(id))add('exploration',2);
+ }
+ for(const id of ex){
+  if(id==='okafor')add('research',4);if(id==='sato')add('industry',4);if(id==='johnson'){add('industry',2);add('exploration',3)}
+  if(id==='alvarez')add('expansion',4);if(id==='mei'){add('research',2);add('exploration',3)}if(id==='williams')add('expansion',2);
+ }
+ const best=Object.entries(score).sort((a,b)=>b[1]-a[1]);return best[0][1]>=best[1][1]+2?best[0][0]:'balanced'
+}
+function effectiveStrategy(s,strategy){if(strategy!=='adaptive')return strategy;if(!s.strategyLean)s.strategyLean=chooseAdaptiveStrategy(s);return s.strategyLean}
+function tryEarth(s,launchRound,u,log,strategy='balanced'){strategy=effectiveStrategy(s,strategy);const r=s.round,c=E.capacities(s),record=x=>{if(log)log.push({round:s.round,phase:'earth',action:x,money:s.money,material:s.material,science:s.science})};
 if(r>=launchRound-(launchRound>=6?4:3)){if(c.people<5&&afford(s,E.rocketCost(s,'habitat'))){if(E.buildRocket(s,'habitat').ok){record('Wohnmodul gebaut');return}}
 if(launchRound>=6&&['expansion','balanced'].includes(strategy)&&c.people<8&&(s.population+s.experts.length)>=6&&afford(s,E.rocketCost(s,'habitat'))){if(E.buildRocket(s,'habitat').ok){record('zweites Wohnmodul gebaut');return}}if(c.resources<9&&afford(s,E.rocketCost(s,'cargo'))){if(E.buildRocket(s,'cargo').ok){record('Frachtraum gebaut');return}}
 if(launchRound>=5){
@@ -14,10 +31,10 @@ if(launchRound>=6&&['research','balanced','industry'].includes(strategy)&&c.tech
 if(launchRound>=7&&c.tech<5&&E.transportableTechs(s).length>3&&afford(s,E.rocketCost(s,'tech'))){if(E.buildRocket(s,'tech').ok){record('zweites Techmodul gebaut');return}}if(c.people<Math.min(7,s.population+s.experts.length)&&afford(s,E.rocketCost(s,'habitat'))){if(E.buildRocket(s,'habitat').ok){record('Wohnmodul gebaut');return}}}
 const techPriority={
  research:['exobioLab','mobileResearch','drones','fabrication','extremophile','foodRecycler','habitats','longRover','builders','oxygen'],
- industry:['fabrication','builders','fusion','drones','habitats','foodRecycler','extremophile','exobioLab','longRover','oxygen'],
- expansion:['habitats','foodRecycler','extremophile','drones','longRover','fabrication','builders','exobioLab','oxygen','fusion'],
- exploration:['drones','longRover','exobioLab','habitats','fabrication','extremophile','foodRecycler','builders','oxygen','fusion'],
- balanced:['drones','extremophile','fabrication','exobioLab','habitats','longRover','foodRecycler','builders','oxygen','fusion']
+ industry:['fabrication','autonomousMining','robotFarm','mobileResearch','builders','fusion','drones','habitats','foodRecycler','extremophile','exobioLab','longRover','oxygen'],
+ expansion:['habitats','robotFarm','mobileResearch','autonomousMining','foodRecycler','extremophile','drones','longRover','fabrication','builders','exobioLab','oxygen','fusion'],
+ exploration:['drones','longRover','mobileResearch','autonomousMining','robotFarm','exobioLab','habitats','fabrication','extremophile','foodRecycler','builders','oxygen','fusion'],
+ balanced:['drones','mobileResearch','robotFarm','autonomousMining','extremophile','fabrication','exobioLab','habitats','longRover','foodRecycler','builders','oxygen','fusion']
 };const pr=techPriority[strategy]||techPriority.balanced;
 for(const id of pr){const t=D.TECHNOLOGIES.find(x=>x.id===id);if(s.technologies[id]==='researched'&&afford(s,t.cost)){if(E.buildTech(s,id).ok){u.tech[id]=(u.tech[id]||0)+1;record(`${t.name} gebaut`);return}}}
 for(const id of pr){const t=D.TECHNOLOGIES.find(x=>x.id===id);if(s.technologies[id]==='locked'&&s.science>=Math.max(0,t.research-1)){if(E.researchTech(s,id).ok){record(`${t.name} erforscht`);return}}}
@@ -28,14 +45,21 @@ if(r<=launchRound-1){
   const candidates=(s.expertMarket||[]).filter(id=>!s.experts.includes(id)).map(id=>{const x=D.EXPERTS.find(e=>e.id===id);let score=base[id]||3;if(id==='williams'&&s.rocket.cargo<1)score-=8;if(launchRound<=4&&s.rocket.cargo<1)score-=4;score-=s.experts.length*2;return{id,x,score}}).filter(z=>z.x&&afford(s,z.x.cost)).sort((a,b)=>b.score-a.score);
   const best=candidates[0];if(best&&best.score>=6){if(E.hireExpert(s,best.id).ok){u.expert[best.id]=(u.expert[best.id]||0)+1;record(`${best.x.name} rekrutiert`);return}}
  }
- const projectScores={research:{openScience:10,mobileResearch:9,recycling:6,globalContracts:5,resourceDepot:4,robotFarm:3,autonomousMining:3},industry:{autonomousMining:10,resourceDepot:8,recycling:7,globalContracts:6,mobileResearch:4,robotFarm:4,openScience:3},expansion:{robotFarm:10,recycling:8,resourceDepot:6,globalContracts:6,mobileResearch:4,openScience:3,autonomousMining:4},exploration:{mobileResearch:9,resourceDepot:7,openScience:6,recycling:5,globalContracts:5,autonomousMining:4,robotFarm:3},balanced:{recycling:8,resourceDepot:7,mobileResearch:7,globalContracts:6,openScience:6,robotFarm:5,autonomousMining:5}}[strategy]||{};
- const pc=(s.projectMarket||[]).map(id=>({id,q:D.PROJECTS.find(x=>x.id===id),score:projectScores[id]||3})).filter(z=>z.q&&!s.projects.includes(z.id)&&afford(s,z.q.cost)).sort((a,b)=>b.score-a.score)[0];
- if(pc&&pc.score>=6){if(E.buyProject(s,pc.id).ok){u.project[pc.id]=(u.project[pc.id]||0)+1;record(`${pc.q.name} gebaut`);return}}
+ const projectScores={
+ research:{openScience:11,aiResearch:10,mobileResearch:9,recycling:7,resourceDepot:6,privateSpace:6,globalContracts:5,autonomousMining:5,deepDrilling:4,automatedChain:4,industry40:4,robotFarm:4,underground:4,redundantGrid:4,evacNetwork:3},
+ industry:{autonomousMining:11,automatedChain:10,deepDrilling:9,resourceDepot:9,recycling:8,industry40:8,globalContracts:7,privateSpace:6,mobileResearch:5,robotFarm:5,openScience:4,aiResearch:3,underground:4,redundantGrid:4,evacNetwork:3},
+ expansion:{robotFarm:11,recycling:9,resourceDepot:8,privateSpace:7,globalContracts:6,autonomousMining:6,mobileResearch:5,openScience:4,deepDrilling:4,automatedChain:4,industry40:4,aiResearch:3,underground:5,redundantGrid:4,evacNetwork:5},
+ exploration:{mobileResearch:10,resourceDepot:8,openScience:8,recycling:7,privateSpace:7,autonomousMining:6,robotFarm:5,globalContracts:5,aiResearch:5,deepDrilling:4,automatedChain:4,industry40:3,underground:4,redundantGrid:4,evacNetwork:3},
+ balanced:{recycling:9,resourceDepot:8,mobileResearch:8,privateSpace:8,globalContracts:7,openScience:7,autonomousMining:7,robotFarm:6,deepDrilling:6,automatedChain:6,aiResearch:6,industry40:5,underground:5,redundantGrid:5,evacNetwork:4}
+ }[strategy]||{};
+ const availableProjects=[...new Set([...(s.projectHand||[]),...(s.projectMarket||[])])];const pc=availableProjects.map(id=>({id,q:D.PROJECTS.find(x=>x.id===id),score:projectScores[id]||3,source:(s.projectHand||[]).includes(id)?'hand':'market'})).filter(z=>z.q&&!s.projects.includes(z.id)&&afford(s,z.q.cost)).sort((a,b)=>b.score-a.score)[0];
+ if(pc&&pc.score>=6){if(E.buyProject(s,pc.id).ok){u.project[pc.id]=(u.project[pc.id]||0)+1;record(`${pc.q.name} gebaut (${pc.source==='hand'?'Hand':'Auslage'})`);return}}
+ if(r<=launchRound-2&&(s.projectHand||[]).length<4&&(s.projectDeck||[]).length&&s.actions>=2){const q=E.drawProjectOffer(s);if(q.ok){const pick=q.cards.map(id=>({id,score:projectScores[id]||3})).sort((a,b)=>b.score-a.score)[0];E.chooseProjectCard(s,pick.id);record(`2 Projektkarten gezogen · ${D.PROJECTS.find(x=>x.id===pick.id)?.name||pick.id} behalten`);return}}
 }
 for(const [bid,type] of [['mine','resources'],['researchCenter','research'],['factory','industry']]){const b=D.STANDARD_BUILDINGS[bid],reg=s.regions.find(x=>x.type===type&&x.status&&x.buildings.length===0);if(reg&&afford(s,b.cost)){if(E.buildEarth(s,bid,reg.id).ok){record(`${b.name} gebaut`);return}}}
 s.actions=0}
-function load(s,strategy='balanced'){const c=E.capacities(s),rank=['johnson','okafor','sato','alvarez','mei','williams','petrov','varga'],owned=rank.filter(id=>s.experts.includes(id));const targetColonists=c.people>=8?Math.min(6,s.population):c.people>=5?Math.min(4,s.population):Math.min(2,s.population);let population=targetColonists,experts=[];for(const id of owned)if(population+experts.length<c.people)experts.push(id);while(population<s.population&&population+experts.length<c.people)population++;const tr={research:['exobioLab','drones','fabrication','extremophile','foodRecycler','habitats','longRover','builders','oxygen','fusion'],industry:['fabrication','builders','fusion','drones','habitats','foodRecycler','extremophile','exobioLab','longRover','oxygen'],expansion:['habitats','foodRecycler','extremophile','drones','longRover','fabrication','builders','exobioLab','oxygen','fusion'],exploration:['drones','longRover','exobioLab','habitats','fabrication','extremophile','foodRecycler','builders','oxygen','fusion'],balanced:['drones','extremophile','fabrication','exobioLab','longRover','habitats','foodRecycler','builders','oxygen','fusion']}[strategy]||[];return{population,experts,material:Math.min(s.material,c.resources),tech:tr.filter(id=>E.transportableTechs(s).includes(id)).slice(0,c.tech)}}
-function tryNE(s,log,strategy='balanced'){const n=s.newEarth,record=x=>{if(log)log.push({round:s.round,phase:'newEarth',action:x,vp:n.vp,material:n.material,food:n.food,science:n.science})};
+function load(s,strategy='balanced'){strategy=effectiveStrategy(s,strategy);const c=E.capacities(s),rank=['johnson','okafor','sato','alvarez','mei','williams','petrov','varga'],owned=rank.filter(id=>s.experts.includes(id));const targetColonists=c.people>=8?Math.min(6,s.population):c.people>=5?Math.min(4,s.population):Math.min(2,s.population);let population=targetColonists,experts=[];for(const id of owned)if(population+experts.length<c.people)experts.push(id);while(population<s.population&&population+experts.length<c.people)population++;const tr={research:['exobioLab','mobileResearch','robotFarm','autonomousMining','drones','fabrication','extremophile','foodRecycler','habitats','longRover','builders','oxygen','fusion'],industry:['fabrication','autonomousMining','robotFarm','mobileResearch','builders','fusion','drones','habitats','foodRecycler','extremophile','exobioLab','longRover','oxygen'],expansion:['habitats','robotFarm','mobileResearch','autonomousMining','foodRecycler','extremophile','drones','longRover','fabrication','builders','exobioLab','oxygen','fusion'],exploration:['drones','longRover','mobileResearch','autonomousMining','robotFarm','exobioLab','habitats','fabrication','extremophile','foodRecycler','builders','oxygen','fusion'],balanced:['drones','mobileResearch','robotFarm','autonomousMining','extremophile','fabrication','exobioLab','longRover','habitats','foodRecycler','builders','oxygen','fusion']}[strategy]||[];return{population,experts,material:Math.min(s.material,c.resources),tech:tr.filter(id=>E.transportableTechs(s).includes(id)).slice(0,c.tech)}}
+function tryNE(s,log,strategy='balanced'){strategy=effectiveStrategy(s,strategy);const n=s.newEarth,record=x=>{if(log)log.push({round:s.round,phase:'newEarth',action:x,vp:n.vp,material:n.material,food:n.food,science:n.science})};
 if(n.missions.filter(m=>m.selected).length<2){const pref={research:{alienTech:6,xenoScience:5},industry:{industryHub:6,xenoScience:2},expansion:{selfSufficient:6,frontier:4},exploration:{frontier:6,xenoScience:5},balanced:{}}[strategy]||{};const score=id=>(pref[id]||0)+({industryHub:n.landingMaterial>=7?8:5,selfSufficient:n.population>=4?8:5,alienTech:(n.experts.includes('okafor')||n.tech.includes('exobioLab'))?9:5,frontier:(n.tech.includes('drones')||n.tech.includes('longRover'))?9:6,xenoScience:(n.experts.includes('okafor')||n.tech.includes('exobioLab'))?8:6}[id]||5);for(const m of n.missions.filter(x=>!x.selected).sort((x,y)=>score(y.id)-score(x.id)).slice(0,2)){E.selectMission(s,m.id);record(`Kolonieziel gewählt: ${m.name}`)}}
 const missions=n.missions.filter(m=>m.selected&&!m.claimed).map(m=>m.id),home=n.tiles.find(x=>x.settlement);
 const valid=(kind,t)=>t&&t.state!=='unknown'&&E.hexDist(home,t)<=1&&!t.buildings.includes(kind);
@@ -61,13 +85,20 @@ if(n.rounds===0&&(n.buildings.mine+n.buildings.farm+n.buildings.lab)===0){
   else if(doBuild(c.kind,c.terr))return;
  }
 }
+// New-Earth engine projects: known cards compete with opportunities unlocked by exploration.
+const projectScore=x=>{
+ let z=0;if(x.production?.material)z+=x.production.material*(strategy==='industry'?5:3);if(x.production?.food)z+=x.production.food*(strategy==='expansion'?5:3);if(x.production?.science)z+=x.production.science*(strategy==='research'?5:3);
+ if(x.range)z+=x.range*(strategy==='exploration'?7:3);if(x.oxygen)z+=x.oxygen*(n.population>=E.oxygenCapacity(s)-1?4:1);if(x.flex)z+=x.flex*4;if(x.settlementDiscount)z+=x.settlementDiscount*(strategy==='expansion'?4:2);if(x.unlock)z+=2;return z-(x.cost.material||0)*.35-(x.cost.science||0)*.25
+};
+const candidates=E.availableNEProjects(s).filter(x=>!E.neProjectHas(s,x.id)&&n.material>=(x.cost.material||0)&&n.science>=(x.cost.science||0)).sort((a,b)=>projectScore(b)-projectScore(a));
+if(candidates.length&&projectScore(candidates[0])>=7){const q=E.buildNEProject(s,candidates[0].id);if(q.ok){record(q.msg);return}}
 // Goal-driven builds; no universal mandatory order.
 if(missions.includes('industryHub')&&prod().material<7&&doBuild('mine',['mineral','canyon','plain']))return;
-if(missions.includes('selfSufficient')&&(n.buildings.farm<2||E.neFoodProd(s)<n.population+2)&&doBuild('farm',['fertile','ice','plain']))return;
+if(missions.includes('selfSufficient')&&(n.buildings.farm<3||E.neFoodProd(s)<n.population+3)&&doBuild('farm',['fertile','ice','plain']))return;
 if(missions.includes('alienTech')&&n.buildings.lab<1&&doBuild('lab',['ruin','plain']))return;
 if(missions.includes('alienTech')&&n.alienResearch.length<3){for(const x of E.ALIEN_RESEARCH.filter(x=>x.path==='salvage'))if(!E.hasAlien(s,x.id)&&n.science>=x.cost){const q=E.alienResearch(s,x.id);if(q.ok){record(q.msg);return}}}
 // Frontier is a legitimate opening: exploration itself now has milestone SP.
-if(missions.includes('frontier')&&(n.roverExplored||0)<5){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>((y.type==='alien'?5:0)+(y.id==='mineral'?3:0)+(y.id==='fertile'?2:0))-((x.type==='alien'?5:0)+(x.id==='mineral'?3:0)+(x.id==='fertile'?2:0)))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}
+if(missions.includes('frontier')&&(n.roverExplored||0)<6){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>((y.type==='alien'?5:0)+(y.id==='mineral'?3:0)+(y.id==='fertile'?2:0))-((x.type==='alien'?5:0)+(x.id==='mineral'?3:0)+(x.id==='fertile'?2:0)))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}
 // Analyze valuable known finds: relics, mission finds, then productive terrain.
 const value=t=>(!freeKnown(t)?-100:0)+(['ruin','signal'].includes(t.discovery.id)?(nearWin?14:11):0)+(missions.includes('xenoScience')?3:0)+(t.discovery.id==='mineral'&&n.buildings.mine<2?5:0)+(['fertile','ice','microbes'].includes(t.discovery.id)&&n.buildings.farm<2?4:0)-(t.discovery.analysis||0);
 for(const t of n.tiles.filter(t=>t.discovery&&!t.analyzed&&!t.blockedBy&&t.discovery.id!=='plain').sort((x,y)=>value(y)-value(x))){const q=E.analyze(s,t.discovery.id,t.id);if(q.ok){record(q.msg);return}}
@@ -87,15 +118,15 @@ const p=prod();
 if(p.material<4&&doBuild('mine',['mineral','canyon','plain']))return;
 if(p.food<n.population&&doBuild('farm',['fertile','ice','plain']))return;
 if(p.science<2&&doBuild('lab',['ruin','plain']))return;
-// Exploration is also useful without Frontier because 3/7 discoveries score.
-if((n.roverExplored||0)<7){const next=(n.roverExplored||0)<3?3:7;if(next-(n.roverExplored||0)<=2){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>(y.type==='alien'?1:0)-(x.type==='alien'?1:0))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}}
+// Exploration is useful for its 5-discovery milestone and for claiming valuable sites.
+if((n.roverExplored||0)<5){const next=5;if(next-(n.roverExplored||0)<=2){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>(y.type==='alien'?1:0)-(x.type==='alien'?1:0))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}}
 // Near the finish line, stop engine-building if a settlement can score immediately.
 if(nearWin&&n.material>=E.neCost(s,'settlement')&&E.neFoodProd(s)>=(E.has(s,'foodRecycler')?0:n.settlements+1)){const t=n.tiles.find(x=>x.analyzed&&!x.settlement&&!x.blockedBy&&E.neReach(s,x));if(t){const q=E.neBuild(s,'settlement',t.id);if(q.ok){record(q.msg);return}}}
 // Deep specialization: only while it still improves a relevant economy; don't spam a fourth/fifth building by identity alone.
 if(strategy==='research'&&n.buildings.lab<3&&!nearWin&&doBuild('lab',['ruin','plain']))return;
 if(strategy==='industry'&&n.buildings.mine<3&&!nearWin&&doBuild('mine',['mineral','canyon','plain']))return;
 if(strategy==='expansion'&&n.buildings.farm<3&&!nearWin&&doBuild('farm',['fertile','ice','plain']))return;
-if(strategy==='exploration'&&(n.roverExplored||0)<7){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>(y.type==='alien'?1:0)-(x.type==='alien'?1:0))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}
+if(strategy==='exploration'&&(n.roverExplored||0)<6){const fr=E.frontierTiles(s),opts=E.explorationOptions(s);if(fr.length&&opts.length){const pick=opts.slice().sort((x,y)=>(y.type==='alien'?1:0)-(x.type==='alien'?1:0))[0],q=E.explore(s,pick.id,null,fr[0].id);if(q.ok){record(`Erkundet: ${pick.name}`);return}}}
 // Develop special sites for SP rather than spam generic buildings.
 if(n.buildings.mine<(strategy==='industry'?3:strategy==='research'?1:2)&&doBuild('mine',['mineral','canyon']))return;
 if(n.buildings.farm<(strategy==='expansion'?3:strategy==='industry'?1:2)&&doBuild('farm',['fertile','ice']))return;
@@ -110,7 +141,7 @@ function compareDeterministic(){const rows=[3,4,5,6,7].map(r=>runOne(r,424242,tr
 
 function createDuel(human,seed=777,strategy='balanced',launchRound=5){
  const ai=createAI(seed,strategy,launchRound),market={projectDeck:human.projectDeck,projectMarket:human.projectMarket,expertDeck:human.expertDeck,expertMarket:human.expertMarket},world={tiles:null};
- syncMarketToPlayer(ai.s,market);return{human,ai,market,world,humanOwner:'H',aiOwner:'KI'};
+ dealProjectHand(ai.s,market,3);syncMarketToPlayer(ai.s,market);return{human,ai,market,world,humanOwner:'H',aiOwner:'KI'};
 }
 function syncHumanDuel(duel){
  const h=duel.human;syncMarketFromPlayer(h,duel.market);
@@ -130,6 +161,11 @@ function aiDuelTurn(duel){
  syncMarketToPlayer(duel.human,duel.market);if(duel.human.newEarth)applyWorldToPlayer({s:duel.human},duel.world,duel.humanOwner);
  return ai;
 }
+function advanceDuelAI(duel){
+ while(!duel.ai.finished&&duel.ai.s.round<duel.human.round)aiDuelTurn(duel);
+ if(!duel.ai.finished&&duel.ai.s.round===duel.human.round&&duel.human.round%2===0)aiDuelTurn(duel);
+ return duel.ai
+}
 function createAI(seed=777,strategy='balanced',launchRound=5){return{s:E.newGame(seed),strategy,launchRound,usage:{tech:{},expert:{},project:{}},landed:null,finished:null}}
 function aiTurn(ai){
  const s=ai.s;if(ai.finished)return ai;
@@ -145,13 +181,15 @@ function aiTurn(ai){
  return ai;
 }
 function configureAI(ai,strategy,launchRound){if(strategy)ai.strategy=strategy;if(launchRound)ai.launchRound=Number(launchRound);return ai}
-function aiSnapshot(ai){const s=ai.s,n=s.newEarth;return{phase:s.phase,round:s.round,strategy:ai.strategy,launchRound:ai.launchRound,vp:n?.vp||0,settlements:n?.settlements||0,buildings:n?.buildings||{},material:n?.material||0,food:n?.food||0,science:n?.science||0,contactLevel:n?.contactLevel||0,finished:ai.finished}}
+function aiSnapshot(ai){const s=ai.s,n=s.newEarth;return{phase:s.phase,round:s.round,strategy:ai.strategy==='adaptive'?(s.strategyLean||'adaptive'):ai.strategy,launchRound:ai.launchRound,vp:n?.vp||0,settlements:n?.settlements||0,buildings:n?.buildings||{},material:n?.material||0,food:n?.food||0,science:n?.science||0,contactLevel:n?.contactLevel||0,finished:ai.finished}}
 
-const api={runOne,aggregate,compareDeterministic,monteCarlo,createAI,configureAI,aiTurn,aiSnapshot,createDuel,syncHumanDuel,aiDuelTurn};root.NewEarthSimulation=api;if(typeof module!=='undefined')
+const api={runOne,aggregate,compareDeterministic,monteCarlo,createAI,configureAI,aiTurn,aiSnapshot,createDuel,syncHumanDuel,aiDuelTurn,advanceDuelAI};root.NewEarthSimulation=api;if(typeof module!=='undefined')
 function makeSharedMarket(seed=1){
  const host=E.newGame(seed);
- return{projectDeck:host.projectDeck,projectMarket:host.projectMarket,expertDeck:host.expertDeck,expertMarket:host.expertMarket};
+ // host hand is returned: runRace deals private hands from one common deck.
+ return{projectDeck:[...(host.projectDeck||[]),...(host.projectHand||[])],projectMarket:host.projectMarket,expertDeck:host.expertDeck,expertMarket:host.expertMarket};
 }
+function dealProjectHand(player,market,count=3){player.projectHand=[];while(player.projectHand.length<count&&market.projectDeck.length)player.projectHand.push(market.projectDeck.shift())}
 function syncMarketToPlayer(p,m){p.projectDeck=m.projectDeck;p.projectMarket=m.projectMarket;p.expertDeck=m.expertDeck;p.expertMarket=m.expertMarket}
 function syncMarketFromPlayer(p,m){m.projectDeck=p.projectDeck;m.projectMarket=p.projectMarket;m.expertDeck=p.expertDeck;m.expertMarket=p.expertMarket}
 function claimSharedTiles(p,world,owner){
@@ -190,9 +228,11 @@ function applyWorldToPlayer(p,world,owner){
 }
 function runRace(seed=1,strategies=['balanced','balanced'],launches=[3,5]){
  const market=makeSharedMarket(seed),world={tiles:null},players=launches.map((lr,i)=>({id:i,s:E.newGame(seed+i*7919),strategy:strategies[i]||'balanced',launchRound:lr,usage:{tech:{},expert:{},project:{}},landed:null,finished:null}));
+ players.forEach(p=>dealProjectHand(p.s,market,3));
  let worldRound=1;
  while(worldRound<25&&!players.some(p=>p.finished)){
-  for(const p of players){
+  const order=worldRound%2?players:[...players].reverse();
+  for(const p of order){
    const st=p.s;if(p.finished)continue;syncMarketToPlayer(st,market);
    if(st.phase==='earth'){
     if(!st.event)E.drawEvent(st);

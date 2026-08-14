@@ -305,3 +305,23 @@ body{
 .ai-status{border-color:#6f8790}.ai-status strong{display:block}.ai-status span{display:block;font-size:.78rem;margin-top:.25rem}
 
 .ai-status{border-color:#6f8790}.ai-status strong,.ai-status span{display:block}.ai-controls{display:flex;gap:.35rem;margin-top:.35rem}.ai-controls select{max-width:9rem;font-size:.72rem;padding:.25rem}
+
+.card.project .design-note{font-weight:700;letter-spacing:.04em}.market-draw,.market-refresh{margin:.35rem;min-height:38px}
+
+.project-zone-title{grid-column:1/-1;font-weight:900;letter-spacing:.08em;margin:.5rem 0 .15rem;padding:.55rem .8rem;border-bottom:2px solid rgba(255,255,255,.22)}
+.project-hand-zone,.project-market-zone{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.75rem;padding:.6rem;border-radius:14px}
+.project-hand-zone{background:rgba(60,90,130,.16);border:1px solid rgba(150,190,255,.2)}
+.project-market-zone{background:rgba(130,100,55,.14);border:1px dashed rgba(230,190,110,.32)}
+.project-controls{grid-column:1/-1;display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+.mission-lock{padding:1rem;border:2px solid rgba(230,190,100,.6);border-radius:14px;margin-bottom:1rem;display:flex;flex-direction:column;gap:.25rem}
+
+.ne-engine{margin:1rem 0;padding:1rem;border:1px solid rgba(120,210,210,.28);border-radius:14px;background:rgba(30,90,95,.12);display:flex;flex-direction:column;gap:.5rem}
+.ne-project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.55rem}
+.ne-project-grid button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:.2rem;min-height:92px}
+.ne-project-grid .discovery-project{border:1px solid rgba(190,150,255,.5);box-shadow:inset 0 0 18px rgba(130,80,200,.08)}
+.unlock-mark{position:absolute;right:8px;top:8px;font-size:1.1rem}
+
+.civ-status{padding:.7rem 1rem;border-radius:12px;margin-bottom:.65rem;display:flex;gap:.6rem;flex-wrap:wrap;border:1px solid rgba(255,255,255,.18)}
+.civ-status.viable{border-color:rgba(120,220,160,.55);background:rgba(60,150,90,.12)}
+.upgrade-actions{display:flex;gap:.35rem;flex-wrap:wrap;width:100%;margin-top:.35rem}
+.ne-hex .scan-hint{font-size:.7rem}
